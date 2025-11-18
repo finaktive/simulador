@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Simulador de Inversión</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0b0f13;        /* sutil oscuro */
+    --panel:#0f1417;
+    --muted:#aeb6c2;
+    --accent:#4ea1ff;
+    --glass: rgba(255,255,255,0.03);
+    --success:#7ef0a6;
+    --danger:#ff8080;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,#071018 0%, var(--bg) 70%);
+    color:#e9eef6;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    min-height:100vh;
+  }
+
+  .wrap{
+    max-width:1100px;
+    margin:32px auto;
+    padding:22px;
+  }
+
+  .hero{
+    text-align:center;
+    margin-bottom:18px;
+    padding:20px 14px;
+    background: linear-gradient(90deg, rgba(78,161,255,0.03), transparent 60%);
+    border-radius:12px;
+    border:1px solid rgba(78,161,255,0.04);
+  }
+  .hero h1{
+    margin:0;
+    color:var(--accent);
+    font-size:30px;
+    font-weight:800;
+  }
+  .hero p{ margin:8px auto 0; color:var(--muted); max-width:900px; font-size:14px }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 420px;
+    gap:18px;
+    margin-top:18px;
+  }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), var(--panel));
+    border-radius:12px;
+    padding:18px;
+    border:1px solid rgba(255,255,255,0.02);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+  }
+
+  label{
+    display:block;
+    font-size:13px;
+    color:var(--muted);
+    font-weight:700;
+    margin-bottom:8px;
+  }
+
+  .input, select{
+    width:100%;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.03);
+    background:transparent;
+    color:#ecf3ff;
+    font-size:15px;
+    outline:none;
+  }
+  .input:focus, select:focus { box-shadow: 0 8px 26px rgba(78,161,255,0.06); transform:translateY(-1px) }
+
+  .cta{
+    margin-top:14px;
+    width:100%;
+    padding:13px 14px;
+    background: linear-gradient(90deg,#1f9bff,#1a6eff);
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-weight:800;
+    font-size:15px;
+    cursor:pointer;
+    box-shadow: 0 12px 30px rgba(26,110,255,0.12);
+  }
+
+  .info{
+    font-size:13px;
+    color:var(--muted);
+    padding:10px 12px;
+    margin-top:12px;
+    border-radius:8px;
+    background: rgba(255,255,255,0.01);
+    border:1px solid rgba(255,255,255,0.02);
+  }
+
+  .summary{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .kpi{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px;
+    border-radius:10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.02);
+  }
+  .kpi .left{ color:var(--muted); font-size:13px }
+  .kpi .right{ font-weight:800; color:#fff; font-size:16px }
+
+  .benefits{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap }
+  .benefit{
+    flex:1 1 45%;
+    padding:10px;
+    border-radius:8px;
+    background: rgba(255,255,255,0.01);
+    color:var(--muted);
+    font-size:13px;
+    border:1px solid rgba(255,255,255,0.02);
+  }
+
+  .mini-table{
+    margin-top:12px;
+    display:flex;
+    gap:10px;
+    flex-direction:column;
+  }
+  .mini-row{
+    display:flex;
+    justify-content:space-between;
+    padding:10px;
+    border-radius:8px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.02);
+    font-size:14px;
+  }
+
+  /* modal */
+  .modal-backdrop{
+    position:fixed; inset:0; display:none;
+    background: rgba(1,2,6,0.6);
+    z-index:999;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .modal{
+    width:100%;
+    max-width:760px;
+    background: linear-gradient(180deg,#071018,#071119);
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.04);
+    padding:18px;
+    color:#eef7ff;
+    box-shadow:0 24px 70px rgba(0,0,0,0.75);
+  }
+  .modal .title{ font-size:18px; color:var(--accent); font-weight:800; margin:0 0 6px 0 }
+  .modal .sub{ color:var(--muted); font-size:13px; margin-bottom:10px }
+  .modal-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .big-num { font-size:26px; font-weight:800; color:var(--success) }
+  .small { font-size:13px; color:var(--muted) }
+
+  .modal .row-flex{ display:flex; gap:10px; align-items:center; justify-content:space-between }
+
+  .btn-ghost{
+    padding:9px 12px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.06);
+    background:transparent;
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .btn-primary{
+    background:linear-gradient(90deg,#3be29b,#06b6d4);
+    color:#011118;
+    border:none;
+    padding:10px 12px;
+    font-weight:800;
+    border-radius:10px;
+    cursor:pointer;
+  }
+
+  .note{ font-size:12px; color:var(--muted); margin-top:10px }
+
+  @media(max-width:980px){
+    .grid{ grid-template-columns: 1fr; }
+    .modal-grid{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>Simulador de Inversión</h1>
+    <p>Ingresa monto y plazo. Verás una proyección clara con tasa visible, ganancia bruta, comisión (mostrada al final) y ganancia neta.</p>
+  </div>
+
+  <div class="grid">
+    <!-- form -->
+    <div class="card">
+      <label for="monto">Monto a invertir (USD)</label>
+      <input id="monto" class="input" type="number" min="30" max="150" placeholder="Ej: 50" value="50">
+
+      <label for="plazo">Plazo (días)</label>
+      <select id="plazo" class="input">
+        <option value="15">15 días</option>
+        <option value="30" selected>30 días</option>
+      </select>
+
+      <div class="info">Tasas visibles: <strong>15 días → 25% (sube con monto)</strong> · <strong>30 días → 50%</strong> (tope máximo).</div>
+
+      <button class="cta" onclick="onCalculate()">Calcular mi inversión</button>
+
+      <div class="info" style="margin-top:12px">
+        * Monto mínimo: <strong>$30</strong>. Monto máximo: <strong>$150</strong>. Resultados referenciales. Comisión del 10% mostrada y restada al final sobre la ganancia bruta.
+      </div>
+
+      <div class="mini-table" id="miniTable">
+        <!-- dynamic small examples appear here -->
+      </div>
+    </div>
+
+    <!-- right summary -->
+    <div class="card summary">
+      <div class="kpi"><div class="left">Rango inversión</div><div class="right">$30 — $150</div></div>
+      <div class="kpi"><div class="left">Plazos</div><div class="right">15 / 30 días</div></div>
+      <div class="kpi"><div class="left">Tasa visible</div><div class="right">25% — 50%</div></div>
+
+      <div style="margin-top:12px; font-weight:800; font-size:15px; color:var(--accent)">Beneficios</div>
+      <div class="benefits">
+        <div class="benefit">✔ Ciclos claros y rápidos</div>
+        <div class="benefit">✔ Proyecciones simples</div>
+        <div class="benefit">✔ Empieza con poco capital</div>
+        <div class="benefit">✔ Acompañamiento personalizado</div>
+      </div>
+
+      <div style="margin-top:12px" class="info">
+        ¿Listo? Calcula y recibe una proyección. Si te interesa, un asesor te contactará para formalizar.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="backdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
+  <div class="modal" role="document" aria-modal="true">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div class="title">Resumen de tu simulación</div>
+        <div class="sub">Resultados estimados al cierre del ciclo (comisión mostrada y restada).</div>
+      </div>
+      <button class="btn-ghost" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-grid" style="margin-top:10px;">
+      <div class="card">
+        <div class="small">Monto a invertir</div>
+        <div class="big-num" id="modalMonto">$0.00</div>
+
+        <div style="height:10px"></div>
+        <div class="small">Plazo</div>
+        <div id="modalPlazo" class="small">30 días</div>
+
+        <div style="height:12px"></div>
+        <div class="small">Tasa visible</div>
+        <div id="modalRate" class="small">0%</div>
+      </div>
+
+      <div class="card">
+        <div class="small">Al final del ciclo recibirás (estimado)</div>
+        <div style="height:8px"></div>
+        <div class="big-num" id="modalTotal">$0.00</div>
+        <div style="height:6px"></div>
+        <div class="small">Ganancia bruta: <span id="modalGross">$0.00</span></div>
+        <div class="small">Comisión (10% sobre monto): <span id="modalCommission">$0.00</span></div>
+        <div class="small">Ganancia neta: <span id="modalNet">$0.00</span></div>
+        <div class="small">Ganancia diaria neta: <span id="modalDaily">$0.00</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px" class="card">
+      <div style="font-size:15px; color:var(--muted)">Ejemplos rápidos</div>
+      <div id="modalExamples" style="margin-top:10px"></div>
+
+      <div class="note">
+        Mejora tu inversión: más monto o plazo pueden aumentar la tasa visible (hasta 50%). <br>
+        Nota: estos resultados son referenciales. La comisión y condiciones finales se acuerdan en contrato.
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:12px; justify-content:flex-end">
+        <button class="btn-ghost" onclick="closeModal()">Cerrar</button>
+        <button class="btn-primary" onclick="ctaInvest()">QUIERO INVERTIR</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // rate logic:
+  // - plazo 15d: base 25% at $30, increases linearly with monto up to +10% at $150 -> max 35%
+  // - plazo 30d: fixed 50% (visible)
+  // Commission: 10% applied on gross gain, shown and subtracted in modal (option B)
+
+  function computeRate(monto, plazo) {
+    if (plazo === 30) return 50; // fixed
+    // plazo 15
+    const min = 25;
+    const max = 35; // increases with monto
+    const ratio = Math.max(0, Math.min(1, (monto - 30) / (150 - 30)));
+    return +(min + (max - min) * ratio).toFixed(2);
+  }
+
+  function formatUSD(x){ return '$' + Number(x).toFixed(2); }
+
+  function onCalculate(){
+    const monto = parseFloat(document.getElementById('monto').value);
+    const plazo = parseInt(document.getElementById('plazo').value,10);
+
+    if (isNaN(monto) || monto < 30 || monto > 150) {
+      alert('Por favor ingresa un monto entre $30 y $150.');
+      return;
+    }
+    if (![15,30].includes(plazo)) {
+      alert('Selecciona un plazo válido.');
+      return;
+    }
+
+    const rate = computeRate(monto, plazo); // visible %
+    const grossGain = monto * (rate / 100); // ganancia bruta visible
+    const commission = monto * 0.10; // 10% sobre monto
+    const netGain = grossGain - commission; // ganancia neta
+    const total = monto + netGain;
+    const dailyNet = netGain / plazo;
+
+    // populate modal main
+    document.getElementById('modalMonto').textContent = formatUSD(monto);
+    document.getElementById('modalPlazo').textContent = plazo + ' días';
+    document.getElementById('modalRate').textContent = rate + ' %';
+    document.getElementById('modalGross').textContent = formatUSD(grossGain);
+    document.getElementById('modalCommission').textContent = formatUSD(commission);
+    document.getElementById('modalNet').textContent = formatUSD(netGain);
+    document.getElementById('modalTotal').textContent = formatUSD(total);
+    document.getElementById('modalDaily').textContent = formatUSD(dailyNet);
+
+    // show three example bumps (monto, +20, +50) but cap at 150
+    const examples = [];
+    const extras = [0,20,50];
+    for (let ex of extras){
+      const m = Math.min(150, monto + ex);
+      const r = computeRate(m, plazo);
+      const gg = m * (r/100);
+      const comm = m * 0.10;
+      const net = gg - comm;
+      const tot = m + net;
+      examples.push({m,r,gg,comm,net,tot});
+    }
+    const exDiv = document.getElementById('modalExamples');
+    exDiv.innerHTML = '';
+    examples.forEach(e=>{
+      const el = document.createElement('div');
+      el.style.display='flex';
+      el.style.justifyContent='space-between';
+      el.style.padding='8px 6px';
+      el.style.borderBottom='1px solid rgba(255,255,255,0.03)';
+      el.innerHTML = `<div style="color:var(--muted)">$${e.m.toFixed(2)} - Tasa ${e.r}%</div>
+                      <div style="font-weight:700">${formatUSD(e.tot)}</div>`;
+      exDiv.appendChild(el);
+    });
+
+    // populate mini-table on left card to show quick compares
+    renderMiniTable(monto, plazo);
+
+    // open modal
+    const backdrop = document.getElementById('backdrop');
+    backdrop.style.display = 'flex';
+    backdrop.setAttribute('aria-hidden','false');
+  }
+
+  function renderMiniTable(monto, plazo){
+    const container = document.getElementById('miniTable');
+    container.innerHTML = '';
+    // show table of increments by +10 from 30 to 150 but only 5 rows around current
+    const steps = [];
+    // choose window near monto
+    let start = Math.max(30, monto - 20);
+    let end = Math.min(150, monto + 30);
+    // build rows every 10
+    for (let m = Math.ceil(start/10)*10; m <= end; m +=10){
+      const r = computeRate(m, plazo);
+      const gross = m * (r/100);
+      const commission = m * 0.10;
+      const net = gross - commission;
+      const total = m + net;
+      steps.push({m,r,total});
+    }
+    // if steps empty fallback to few increments
+    if (steps.length===0){
+      for (let m=30;m<=150;m+=30){
+        const r=computeRate(m,plazo);
+        steps.push({m,r,total:m + (m*(r/100)) - (m*(r/100)*0.1)});
+      }
+    }
+    // render
+    steps.forEach(s=>{
+      const row = document.createElement('div');
+      row.className='mini-row';
+      row.innerHTML = `<div style="color:var(--muted)">$${s.m.toFixed(0)} • ${s.r}%</div><div style="font-weight:800">${formatUSD(s.total)}</div>`;
+      container.appendChild(row);
+    });
+  }
+
+  function closeModal(){
+    const backdrop = document.getElementById('backdrop');
+    backdrop.style.display = 'none';
+    backdrop.setAttribute('aria-hidden','true');
+  }
+
+  function ctaInvest(){
+    const monto = parseFloat(document.getElementById('monto').value || 0);
+    const plazo = parseInt(document.getElementById('plazo').value || 0,10);
+    // WhatsApp pre-filled message - change number to your own with country code
+    const msg = encodeURIComponent(`Hola, quiero invertir $${monto.toFixed(2)} por ${plazo} días. Solicito más información y formalizar.`);
+    window.open('https://wa.me/593987699957?text=' + msg, '_blank');
+  }
+
+  // close on backdrop click
+  document.getElementById('backdrop').addEventListener('click', function(e){
+    if (e.target === this) closeModal();
+  });
+
+  // init sample mini table on load
+  document.addEventListener('DOMContentLoaded', function(){
+    renderMiniTable(50,30);
+  });
+
+</script>
+
+</body>
+</html>
