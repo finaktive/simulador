@@ -383,7 +383,7 @@ label{
         <div style="border-bottom:1px solid #e2e8f0; margin: 8px 0;"></div>
         <div class="net-capital-row" style="color:var(--primary-dark)">
             <strong>Aporte Real Operativo:</strong>
-            <strong id="resCapitalNeto">$0.00</strong>
+            <strong id="resAporteNeto">$0.00</strong>
         </div>
       </div>
 
@@ -444,7 +444,7 @@ function calculate() {
 
   // VALIDACIÓN: 30 a 500 USD
   if (isNaN(montoEnviado) || montoEnviado < 30 || montoEnviado > 500) {
-    alert("Por favor, ingresa un capital entre $30 y $500 USD.");
+    alert("Por favor, ingresa un aporte entre $30 y $500 USD.");
     return;
   }
 
@@ -531,6 +531,7 @@ function formatUSD(num) {
 </body>
 
 </html>
+
 
 
 
