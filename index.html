@@ -479,13 +479,13 @@ function calculate() {
 
   // Guardar datos
   calcData = { 
-    montoEnviado, isd, capitalOperativo, plazo, rate, gross: grossGain, fee, net: netGain, total 
+    montoEnviado, isd, aporteOperativo, plazo, rate, gross: grossGain, fee, net: netGain, total 
   };
 
   // Renderizar en Modal
   document.getElementById('resMontoEnviado').innerText = formatUSD(montoEnviado);
   document.getElementById('resISD').innerText = "-" + formatUSD(isd);
-  document.getElementById('resCapitalNeto').innerText = formatUSD(capitalOperativo);
+  document.getElementById('resAporteNeto').innerText = formatUSD(aporteOperativo);
 
   document.getElementById('resRate').innerText = rate.toFixed(2) + "%";
   document.getElementById('resGross').innerText = formatUSD(grossGain);
@@ -506,14 +506,14 @@ function contactWhatsApp() {
   const text = `Hola FINAK, he realizado una simulación y me interesa la gestión.
   
 [ DETALLES DE PROYECCIÓN ]
-> Capital Enviado: $${calcData.montoEnviado.toFixed(2)}
-> Capital Operativo (Neto): $${calcData.capitalOperativo.toFixed(2)}
+> Aporte Enviado: $${calcData.montoEnviado.toFixed(2)}
+> Aporte Operativo (Neto): $${calcData.capitalOperativo.toFixed(2)}
 
 > Ciclo: ${calcData.plazo} Dias
 > Objetivo Técnico: ${calcData.rate}%
 
 [ RESULTADOS ESTIMADOS ]
-> Utilidad Neta Cliente: $${calcData.net.toFixed(2)}
+> Excedente Neto Cliente: $${calcData.net.toFixed(2)}
 > Total Estimado a Recibir: $${calcData.total.toFixed(2)}
 
 Quisiera saber cuáles son los pasos para empezar. Quedo a la espera de su respuesta.`;
@@ -531,5 +531,6 @@ function formatUSD(num) {
 </body>
 
 </html>
+
 
 
