@@ -329,7 +329,7 @@ label{
     </div>
 
     <div class="card summary-card">
-      <div class="summary-title">Resumen del Servicio</div>
+      <div class="summary-title">Resumen de gestión</div>
       
       <div class="kpi-row">
         <span class="kpi-label">Modelo</span>
@@ -393,7 +393,7 @@ label{
       </div>
 
       <div class="result-row">
-        <span style="color: #64748b;">Utilidad Bruta:</span>
+        <span style="color: #64748b;">Excedente Bruto:</span>
         <span class="res-val" id="resGross">$0.00</span>
       </div>
 
@@ -470,12 +470,12 @@ function calculate() {
   rate = Math.round(rate * 100) / 100;
 
   // Cálculos Financieros
-  let grossGain = capitalOperativo * (rate / 100);
+  let grossGain = aporteOperativo * (rate / 100);
   let fee = grossGain * 0.20; // 20% Comisión
   let netGain = grossGain - fee;
   
   // Total = Capital Operativo + Ganancia Neta
-  let total = capitalOperativo + netGain;
+  let total = aporteOperativo + netGain;
 
   // Guardar datos
   calcData = { 
@@ -507,7 +507,7 @@ function contactWhatsApp() {
   
 [ DETALLES DE PROYECCIÓN ]
 > Aporte Enviado: $${calcData.montoEnviado.toFixed(2)}
-> Aporte Operativo (Neto): $${calcData.capitalOperativo.toFixed(2)}
+> Aporte Operativo (Neto): $${calcData.aporteOperativo.toFixed(2)}
 
 > Ciclo: ${calcData.plazo} Dias
 > Objetivo Técnico: ${calcData.rate}%
@@ -531,6 +531,7 @@ function formatUSD(num) {
 </body>
 
 </html>
+
 
 
 
